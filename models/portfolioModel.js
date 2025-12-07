@@ -7,21 +7,27 @@ export const getAllPortfolios = async () => {
 
 export const createPortfolio = async ({ title, description, image, category }) => {
   const res = await pool.query(
-    "INSERT INTO portfolios (title, description, image, category) VALUES ($1,$2,$3,$4) RETURNING *",
+    `INSERT INTO portfolios (title, description, image, category)
+     VALUES ($1, $2, $3, $4) RETURNING *`,
     [title, description, image, category]
   );
   return res.rows[0];
 };
 
-export const updatePortfolio = async (id, { title, description, image, category }) => {
+export const updatePortfolio = async (id, data) => {
+  const { title, description, image, category } = data;
+
   const res = await pool.query(
-    "UPDATE portfolios SET title=$1, description=$2, image=$3, category=$4 WHERE id=$5 RETURNING *",
+    `UPDATE portfolios
+     SET title=$1, description=$2, image=$3, category=$4
+     WHERE id=$5 RETURNING *`,
     [title, description, image, category, id]
   );
-  return res.rows[0];
+
+  return res.rows[0] || null;
 };
 
 export const deletePortfolio = async (id) => {
-  await pool.query("DELETE FROM portfolios WHERE id=$1", [id]);
-  return { message: "Deleted successfully" };
+  const res = await pool.query("DELETE FROM portfolios WHERE id=$1 RETURNING id", [id]);
+  return res.rowCount > 0;
 };

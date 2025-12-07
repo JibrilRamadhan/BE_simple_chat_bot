@@ -7,22 +7,27 @@ export const getAllTestimonials = async () => {
 
 export const createTestimonial = async ({ name, handle, avatar, text, href }) => {
   const res = await pool.query(
-    "INSERT INTO testimonials (name, handle, avatar, text, href) VALUES ($1,$2,$3,$4,$5) RETURNING *",
+    `INSERT INTO testimonials (name, handle, avatar, text, href)
+     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
     [name, handle, avatar, text, href]
   );
   return res.rows[0];
 };
 
+export const updateTestimonial = async (id, data) => {
+  const { name, handle, avatar, text, href } = data;
 
-export const updateTestimonial = async (id, { name, handle, avatar, text, href }) => {
   const res = await pool.query(
-    "UPDATE testimonials SET name=$1, handle=$2, avatar=$3, text=$4, href=$5 WHERE id=$6 RETURNING *",
+    `UPDATE testimonials
+     SET name=$1, handle=$2, avatar=$3, text=$4, href=$5
+     WHERE id=$6 RETURNING *`,
     [name, handle, avatar, text, href, id]
   );
-  return res.rows[0];
+
+  return res.rows[0] || null;
 };
 
 export const deleteTestimonial = async (id) => {
-  await pool.query("DELETE FROM testimonials WHERE id=$1", [id]);
-  return { message: "Deleted successfully" };
+  const res = await pool.query("DELETE FROM testimonials WHERE id=$1 RETURNING id", [id]);
+  return res.rowCount > 0;
 };
