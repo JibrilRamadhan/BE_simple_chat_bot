@@ -1,15 +1,14 @@
-import dotenv from "dotenv";
 import pkg from "pg";
-
-dotenv.config();
-
 const { Pool } = pkg;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // penting untuk Supabase/Neon
-  },
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  ssl: { rejectUnauthorized: false },
+  connectionTimeoutMillis: 5000,
+  keepAlive: true,
 });
-
 export default pool;
